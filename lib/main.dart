@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:findfurriend/controllers/slider_controller.dart';
 import 'package:findfurriend/views/slider_view.dart';
+import 'package:findfurriend/views/login_view.dart';
+import 'package:findfurriend/views/register_view.dart';
 
 void main() {
   Get.put(SliderController());
@@ -18,7 +20,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       getPages: [
         GetPage(name: '/', page: () => SliderView()),
-        // Add other routes here
+        GetPage(name: '/login', page: () => LoginView()),
+        GetPage(name: '/register', page: () => RegisterView()),
       ],
       theme: ThemeData(
         primarySwatch: Colors.orange,
