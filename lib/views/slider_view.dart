@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:async';
 import '../controllers/slider_controller.dart';
 
@@ -16,25 +17,21 @@ class SliderView extends GetView<SliderController> {
     final services = [
       {
         'title': 'Grooming',
-        'emoji': '🛁',
         'description':
             'Perawatan profesional untuk membuat hewan peliharaan Anda tampil memukau dan sehat',
       },
       {
         'title': 'Boarding',
-        'emoji': '🏨',
         'description':
             'Tempat istirahat nyaman dengan pemantauan 24 jam saat Anda sedang berlibur',
       },
       {
         'title': 'Day Care',
-        'emoji': '🎮',
         'description':
             'Ruang bermain yang aman untuk hewan peliharaan bersosialisasi dan berolahraga',
       },
       {
         'title': 'Training',
-        'emoji': '🎓',
         'description':
             'Program latihan terstruktur dengan metode modern untuk mengendalikan perilaku',
       },
@@ -45,7 +42,52 @@ class SliderView extends GetView<SliderController> {
       body: SafeArea(
         child: Column(
           children: [
-            // Modern Slider dengan auto-swipe
+            // Header
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.orange.shade400, Colors.orange.shade600],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Image.asset(
+                          'assets/logo.jpeg',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        'FindFurriend',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Slider
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
@@ -57,7 +99,7 @@ class SliderView extends GetView<SliderController> {
                   );
                 }
 
-                // Setup auto-swipe timer
+                // Auto-swipe timer
                 if (controller.imageUrls.isNotEmpty) {
                   autoSwipeTimer?.cancel();
                   Future.delayed(const Duration(milliseconds: 500), () {
@@ -66,8 +108,7 @@ class SliderView extends GetView<SliderController> {
                       (timer) {
                         if (pageController.hasClients) {
                           currentIndex.value =
-                              (currentIndex.value + 1) %
-                              controller.imageUrls.length;
+                              (currentIndex.value + 1) % controller.imageUrls.length;
                           pageController.animateToPage(
                             currentIndex.value,
                             duration: const Duration(milliseconds: 800),
@@ -98,14 +139,12 @@ class SliderView extends GetView<SliderController> {
                         },
                       ),
                     ),
-                    // Indicator dots dengan animasi
+                    // Indicator dots
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(controller.imageUrls.length, (
-                          index,
-                        ) {
+                        children: List.generate(controller.imageUrls.length, (index) {
                           return Obx(
                             () => AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
@@ -128,7 +167,7 @@ class SliderView extends GetView<SliderController> {
               }),
             ),
 
-            // Modern Start Button - Mengarah ke login
+            // Start button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
               child: Container(
@@ -156,10 +195,7 @@ class SliderView extends GetView<SliderController> {
                     },
                     borderRadius: BorderRadius.circular(50),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 40,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
@@ -188,7 +224,7 @@ class SliderView extends GetView<SliderController> {
   }
 }
 
-// Widget untuk service card - Gambar persegi panjang dengan deskripsi di bawah
+// ServiceCard widget responsif
 class ServiceCard extends StatelessWidget {
   final String imageUrl;
   final Map<String, String> service;
@@ -210,47 +246,45 @@ class ServiceCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Gambar horizontal dengan AspectRatio tapi dibatasi tingginya
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: 180, // Kurangi tinggi agar pas di HP 6.5 inch
-              ),
-              child: AspectRatio(
-                aspectRatio:
-                    4 / 3, // Horizontal (lebar lebih besar dari tinggi)
-                child: ClipRRect(
+            // Gambar responsif
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final height = width * 0.6; // ratio horizontal 5:3
+
+                return ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    color: Colors.orange.shade50,
-                    child: Image.asset(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.orange.shade100,
-                          child: const Center(
-                            child: Icon(
-                              Icons.pets,
-                              size: 100,
-                              color: Colors.orange,
-                            ),
-                          ),
-                        );
-                      },
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.cover, // bisa BoxFit.contain kalau tidak mau crop
+                    placeholder: (context, url) => Container(
+                      color: Colors.orange.shade100,
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.orange.shade100,
+                      child: const Center(
+                        child: Icon(Icons.pets, size: 100, color: Colors.orange),
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
             const SizedBox(height: 20),
-            // Deskripsi di bawah
+
+            // Deskripsi
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  service['title']!,
+                  '${service['emoji'] ?? ''} ${service['title']!}',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
