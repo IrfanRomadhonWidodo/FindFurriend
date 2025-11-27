@@ -291,6 +291,15 @@ class HomePage extends StatelessWidget {
                             if (service['title'] == 'Grooming') {
                               Get.toNamed('/grooming');
                             }
+                            else if (service['title'] == 'Day Care') {
+                              Get.toNamed('/daycare');
+                              }
+                            else if (service['title'] == 'Boarding') {
+                              Get.toNamed('/boarding');
+                            }
+                            else if (service['title'] == 'Training') {
+                              Get.toNamed('/training');
+                            }
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -541,5 +550,5 @@ class ProfilePage extends StatelessWidget {
         ),
       ),
     );
-  }
+}
 }
