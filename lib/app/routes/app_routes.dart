@@ -1,9 +1,11 @@
+//app/routes/app_routes.dart
 import 'package:get/get.dart';
 import '../views/login_view.dart';
 import '../views/register_view.dart';
 import '../views/slider_view.dart';
 import '../views/home_view.dart';
 import '../views/grooming/grooming_view.dart';
+import '../views/grooming/payment_view.dart';
 
 class AppRoutes {
   static final pages = [
@@ -12,5 +14,6 @@ class AppRoutes {
     GetPage(name: '/register', page: () => RegisterView()),
     GetPage(name: '/home', page: () => HomeView()),
     GetPage(name: '/grooming', page: () => GroomingView()),
+    GetPage(name: '/upload-payment', page: () => PaymentView()),
   ];
 }

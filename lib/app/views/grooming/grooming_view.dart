@@ -1,3 +1,4 @@
+//grooming_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -480,13 +481,8 @@ class GroomingView extends StatelessWidget {
                     );
                     return;
                   }
-                  Get.snackbar(
-                    "Sukses",
-                    "Checkout berhasil",
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                  );
+
+                  controller.saveGroomingOrder(); // <<-- INI TAMBAH
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,

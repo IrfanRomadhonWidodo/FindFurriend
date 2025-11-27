@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "33410031150",
+    "firebase_url": "https://findfurriend-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "findfurriend",
     "storage_bucket": "findfurriend.firebasestorage.app"
   },

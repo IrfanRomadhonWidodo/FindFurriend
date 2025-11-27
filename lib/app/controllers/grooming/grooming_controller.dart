@@ -1,6 +1,9 @@
+//grooming_controller.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class GroomingController extends GetxController {
   var selectedPet = 'Kucing'.obs;
@@ -28,75 +31,102 @@ class GroomingController extends GetxController {
     },
   };
 
-  // Kode promo yang tersedia (diskon dalam persentase)
+  // Kode promo
   Map<String, double> promoCodes = {
-    "FINDFURRIEND99": 0.10, // Diskon 10%
-    "PETCARE20": 0.15, // Diskon 15%
-    "GROOMING15": 0.20, // Diskon 20%
+    "FINDFURRIEND99": 0.10,
+    "PETCARE20": 0.15,
+    "GROOMING15": 0.20,
   };
 
-  // Harga asli sebelum diskon
   int get originalPrice {
     return priceTable[selectedPet.value]?[selectedPackage.value] ?? 0;
   }
 
-  // Total harga setelah diskon
   int get totalPrice {
     double price = originalPrice.toDouble();
-
-    // Cek apakah kode promo valid
-    if (promoCode.value.isNotEmpty &&
-        promoCodes.containsKey(promoCode.value.toUpperCase())) {
-      double discountPercentage = promoCodes[promoCode.value.toUpperCase()]!;
-      price = price * (1 - discountPercentage);
+    if (promoCodes.containsKey(promoCode.value.toUpperCase())) {
+      price *= (1 - promoCodes[promoCode.value.toUpperCase()]!);
     }
-
     return price.round();
   }
 
-  // Mendapatkan persentase diskon
   double get discountPercentage {
-    if (promoCode.value.isNotEmpty &&
-        promoCodes.containsKey(promoCode.value.toUpperCase())) {
+    if (promoCodes.containsKey(promoCode.value.toUpperCase())) {
       return promoCodes[promoCode.value.toUpperCase()]!;
     }
     return 0.0;
   }
 
-  // Mendapatkan nominal diskon
   int get discountAmount {
-    if (promoCode.value.isNotEmpty &&
-        promoCodes.containsKey(promoCode.value.toUpperCase())) {
-      return (originalPrice * discountPercentage).round();
-    }
-    return 0;
+    return (originalPrice * discountPercentage).round();
   }
 
-  // Mengecek apakah kode promo valid
   bool get isPromoValid {
-    return promoCode.value.isNotEmpty &&
-        promoCodes.containsKey(promoCode.value.toUpperCase());
+    return promoCodes.containsKey(promoCode.value.toUpperCase());
   }
 
   String formatPrice(int price) {
-    final format = NumberFormat.currency(
+    return NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
       decimalDigits: 0,
-    );
-    return format.format(price);
+    ).format(price);
   }
 
   void selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate.value,
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 30)),
     );
 
-    if (picked != null && picked != selectedDate.value) {
+    if (picked != null) {
       selectedDate.value = picked;
     }
+  }
+
+  // ================================
+  // 🔥 SAVE ORDER FIREBASE DISINI
+  // ================================
+  Future<void> saveGroomingOrder() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      Get.snackbar(
+        "Gagal",
+        "Login dulu dong 😅",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    DatabaseReference ref = FirebaseDatabase.instance.ref("orders").push();
+
+    await ref.set({
+      "orderId": ref.key,
+      "userId": user.uid,
+      "pet": selectedPet.value,
+      "package": selectedPackage.value,
+      "originalPrice": originalPrice,
+      "discount": discountAmount,
+      "totalPrice": totalPrice,
+      "promoCode": promoCode.value,
+      "date": selectedDate.value.toIso8601String(),
+      "status": "pending-payment",
+      "createdAt": DateTime.now().toIso8601String(),
+    });
+
+    Get.snackbar(
+      "Sukses 🎉",
+      "Pesanan berhasil dibuat!",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
+
+    Get.toNamed('/upload-payment', arguments: ref.key);
   }
 }

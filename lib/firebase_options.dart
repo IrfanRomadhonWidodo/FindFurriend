@@ -4,16 +4,6 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Default [FirebaseOptions] for use with your Firebase apps.
-///
-/// Example:
-/// ```dart
-/// import 'firebase_options.dart';
-/// // ...
-/// await Firebase.initializeApp(
-///   options: DefaultFirebaseOptions.currentPlatform,
-/// );
-/// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -30,8 +20,7 @@ class DefaultFirebaseOptions {
         return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+          'DefaultFirebaseOptions have not been configured for linux.',
         );
       default:
         throw UnsupportedError(
@@ -48,6 +37,8 @@ class DefaultFirebaseOptions {
     authDomain: 'findfurriend.firebaseapp.com',
     storageBucket: 'findfurriend.firebasestorage.app',
     measurementId: 'G-PKV7K70PF6',
+    databaseURL:
+        'https://findfurriend-default-rtdb.asia-southeast1.firebasedatabase.app/',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -56,6 +47,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '33410031150',
     projectId: 'findfurriend',
     storageBucket: 'findfurriend.firebasestorage.app',
+    databaseURL:
+        'https://findfurriend-default-rtdb.asia-southeast1.firebasedatabase.app/',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -65,6 +58,8 @@ class DefaultFirebaseOptions {
     projectId: 'findfurriend',
     storageBucket: 'findfurriend.firebasestorage.app',
     iosBundleId: 'com.example.findfurriend',
+    databaseURL:
+        'https://findfurriend-default-rtdb.asia-southeast1.firebasedatabase.app/',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -74,6 +69,8 @@ class DefaultFirebaseOptions {
     projectId: 'findfurriend',
     storageBucket: 'findfurriend.firebasestorage.app',
     iosBundleId: 'com.example.findfurriend',
+    databaseURL:
+        'https://findfurriend-default-rtdb.asia-southeast1.firebasedatabase.app/',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -84,5 +81,7 @@ class DefaultFirebaseOptions {
     authDomain: 'findfurriend.firebaseapp.com',
     storageBucket: 'findfurriend.firebasestorage.app',
     measurementId: 'G-75Y8NFWRX6',
+    databaseURL:
+        'https://findfurriend-default-rtdb.asia-southeast1.firebasedatabase.app/',
   );
 }
