@@ -47,7 +47,10 @@ class SliderView extends GetView<SliderController> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 25,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.orange.shade400, Colors.orange.shade600],
@@ -108,7 +111,8 @@ class SliderView extends GetView<SliderController> {
                       (timer) {
                         if (pageController.hasClients) {
                           currentIndex.value =
-                              (currentIndex.value + 1) % controller.imageUrls.length;
+                              (currentIndex.value + 1) %
+                              controller.imageUrls.length;
                           pageController.animateToPage(
                             currentIndex.value,
                             duration: const Duration(milliseconds: 800),
@@ -144,7 +148,9 @@ class SliderView extends GetView<SliderController> {
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(controller.imageUrls.length, (index) {
+                        children: List.generate(controller.imageUrls.length, (
+                          index,
+                        ) {
                           return Obx(
                             () => AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
@@ -195,7 +201,10 @@ class SliderView extends GetView<SliderController> {
                     },
                     borderRadius: BorderRadius.circular(50),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 40,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
@@ -258,19 +267,26 @@ class ServiceCard extends StatelessWidget {
                     imageUrl: imageUrl,
                     width: width,
                     height: height,
-                    fit: BoxFit.cover, // bisa BoxFit.contain kalau tidak mau crop
+                    fit: BoxFit
+                        .cover, // bisa BoxFit.contain kalau tidak mau crop
                     placeholder: (context, url) => Container(
                       color: Colors.orange.shade100,
                       child: const Center(
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.orange,
+                          ),
                         ),
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
                       color: Colors.orange.shade100,
                       child: const Center(
-                        child: Icon(Icons.pets, size: 100, color: Colors.orange),
+                        child: Icon(
+                          Icons.pets,
+                          size: 100,
+                          color: Colors.orange,
+                        ),
                       ),
                     ),
                   ),

@@ -1,0 +1,16 @@
+import 'package:get/get.dart';
+import '../views/login_view.dart';
+import '../views/register_view.dart';
+import '../views/slider_view.dart';
+import '../views/home_view.dart';
+import '../views/grooming/grooming_view.dart';
+
+class AppRoutes {
+  static final pages = [
+    GetPage(name: '/', page: () => SliderView()),
+    GetPage(name: '/login', page: () => LoginView()),
+    GetPage(name: '/register', page: () => RegisterView()),
+    GetPage(name: '/home', page: () => HomeView()),
+    GetPage(name: '/grooming', page: () => GroomingView()),
+  ];
+}

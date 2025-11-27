@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginController extends GetxController {
   var emailController = ''.obs;
   var passwordController = ''.obs;
+
   var isPasswordVisible = false.obs;
   var isLoading = false.obs;
 
@@ -23,36 +25,49 @@ class LoginController extends GetxController {
       return;
     }
 
+    if (!email.contains('@')) {
+      Get.snackbar(
+        'Error',
+        'Format email tidak valid',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     isLoading(true);
 
     try {
-      // Simulasi login delay
-      await Future.delayed(const Duration(seconds: 2));
+      // 🔥 Login ke Firebase
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      // Validasi email sederhana
-      if (!email.contains('@')) {
-        Get.snackbar(
-          'Error',
-          'Email tidak valid',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-        return;
-      }
+      isLoading(false);
 
-      // Simulasi login berhasil
       Get.snackbar(
         'Sukses',
-        'Login berhasil!',
+        'Login berhasil 🎉',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
 
-      // TODO: Navigasi ke home page setelah login berhasil
-      // Get.toNamed('/home');
+      // 🔀 Gas ke halaman Home setelah login berhasil
+      Get.offAllNamed('/home');
+    } on FirebaseAuthException catch (e) {
+      isLoading(false);
+      Get.snackbar(
+        'Login Gagal',
+        e.message ?? 'Akun tidak ditemukan',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     } catch (e) {
+      isLoading(false);
       Get.snackbar(
         'Error',
         'Terjadi kesalahan: $e',
@@ -60,8 +75,11 @@ class LoginController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    } finally {
-      isLoading(false);
     }
+  }
+
+  Future<void> logout() async {
+    await FirebaseAuth.instance.signOut();
+    Get.offAllNamed('/'); // balik ke login setelah logout
   }
 }

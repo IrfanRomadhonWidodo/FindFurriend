@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterController extends GetxController {
   var nameController = ''.obs;
   var emailController = ''.obs;
   var passwordController = ''.obs;
   var confirmPasswordController = ''.obs;
+
   var isPasswordVisible = false.obs;
   var isConfirmPasswordVisible = false.obs;
   var isLoading = false.obs;
@@ -74,10 +76,12 @@ class RegisterController extends GetxController {
     isLoading(true);
 
     try {
-      // Simulasi register delay
-      await Future.delayed(const Duration(seconds: 2));
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-      // Simulasi register berhasil
+      await userCredential.user?.updateDisplayName(name);
+      await userCredential.user?.reload();
+
       Get.snackbar(
         'Sukses',
         'Registrasi berhasil! Silakan login.',
@@ -86,12 +90,11 @@ class RegisterController extends GetxController {
         colorText: Colors.white,
       );
 
-      // Kembali ke login page
-      Get.back();
-    } catch (e) {
+      Get.offAllNamed('/login');
+    } on FirebaseAuthException catch (e) {
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan: $e',
+        e.message ?? 'Gagal register',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
