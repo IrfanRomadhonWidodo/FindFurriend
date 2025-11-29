@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GroomingController extends GetxController {
   var selectedPet = 'Kucing'.obs;
@@ -103,10 +103,10 @@ class GroomingController extends GetxController {
       return;
     }
 
-    DatabaseReference ref = FirebaseDatabase.instance.ref("orders").push();
+    final orderRef = FirebaseFirestore.instance.collection("orders").doc();
 
-    await ref.set({
-      "orderId": ref.key,
+    await orderRef.set({
+      "orderId": orderRef.id,
       "userId": user.uid,
       "pet": selectedPet.value,
       "package": selectedPackage.value,
@@ -127,6 +127,6 @@ class GroomingController extends GetxController {
       colorText: Colors.white,
     );
 
-    Get.toNamed('/upload-payment', arguments: ref.key);
+    Get.toNamed('/upload-payment', arguments: orderRef.id);
   }
 }

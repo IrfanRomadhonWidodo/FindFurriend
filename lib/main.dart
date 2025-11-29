@@ -8,15 +8,33 @@ import 'app/controllers/slider_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const MyAppInit());
+}
 
-  Get.put(SliderController());
+class MyAppInit extends StatelessWidget {
+  const MyAppInit({super.key});
 
-  runApp(const MyApp());
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          Get.put(SliderController());
+          return const MyApp();
+        }
+        return const MaterialApp(
+          home: Scaffold(body: Center(child: CircularProgressIndicator())),
+        );
+      },
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart'; // buat cek kIsWeb
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/grooming/payment_controller.dart';
+import 'dart:io';
 
 class PaymentView extends StatelessWidget {
   PaymentView({super.key});
@@ -13,16 +15,15 @@ class PaymentView extends StatelessWidget {
     final String orderId = Get.arguments ?? '';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF9C4), // Light yellow background
+      backgroundColor: const Color(
+        0xFFF5F5F5,
+      ), // Disesuaikan dengan GroomingView
       appBar: AppBar(
+        title: const Text("Upload Bukti Pembayaran"), // Menghapus GoogleFonts
         backgroundColor: Colors.orange,
-        title: Text(
-          "Upload Bukti Pembayaran",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-        ),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back), // Disesuaikan dengan GroomingView
           onPressed: () => Get.back(),
         ),
       ),
@@ -40,30 +41,32 @@ class PaymentView extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Payment Details Card
+              // Payment Details Card - Disesuaikan desainnya
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.grey.shade300),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.orange.withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       "Rincian Pembayaran",
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.orange[800],
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -84,8 +87,8 @@ class PaymentView extends StatelessWidget {
 
                     // Date & Time
                     _buildDetailRow(
-                      "Tanggal & Waktu",
-                      "${controller.paymentDetails['date']} - ${controller.paymentDetails['time']}",
+                      "Tanggal",
+                      "${controller.paymentDetails['date']}",
                     ),
                     const SizedBox(height: 10),
 
@@ -97,16 +100,16 @@ class PaymentView extends StatelessWidget {
                     const SizedBox(height: 15),
 
                     // Divider
-                    Divider(color: Colors.orange[200]),
+                    Divider(color: Colors.grey.shade300),
                     const SizedBox(height: 15),
 
                     // Bank Details
-                    Text(
+                    const Text(
                       "Informasi Transfer",
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.orange[800],
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -130,26 +133,27 @@ class PaymentView extends StatelessWidget {
                     const SizedBox(height: 15),
 
                     // Divider
-                    Divider(color: Colors.orange[200]),
+                    Divider(color: Colors.grey.shade300),
                     const SizedBox(height: 15),
 
                     // Total Amount
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text(
                           "Total Pembayaran",
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Colors.black87,
                           ),
                         ),
                         Text(
-                          "Rp ${controller.paymentDetails['price']}",
-                          style: GoogleFonts.poppins(
+                          "Rp ${_formatCurrency(controller.paymentDetails['price'])}",
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange[800],
+                            color: Colors.orange,
                           ),
                         ),
                       ],
@@ -158,49 +162,54 @@ class PaymentView extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 25),
 
-              // Upload Instructions
+              // Upload Instructions - Disesuaikan desainnya
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Colors.orange[50],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.orange[200]!),
+                  border: Border.all(color: Colors.grey.shade300),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.orange[800]),
+                        const Icon(Icons.info_outline, color: Colors.orange),
                         const SizedBox(width: 8),
-                        Text(
+                        const Text(
                           "Petunjuk Pembayaran",
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange[800],
+                            color: Colors.black87,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Text(
+                    const Text(
                       "1. Transfer sesuai jumlah total pembayaran\n"
                       "2. Ambil foto/scan bukti transfer\n"
                       "3. Upload bukti pembayaran menggunakan tombol di bawah",
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.orange[900],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.black87),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 25),
 
               // Image Preview
               if (controller.selectedImage.value != null)
@@ -209,20 +218,33 @@ class PaymentView extends StatelessWidget {
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.orange[300]!),
+                    border: Border.all(color: Colors.grey.shade300),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: Image.file(
-                      controller.selectedImage.value!,
-                      fit: BoxFit.cover,
-                    ),
+                    child: kIsWeb
+                        ? Image.network(
+                            controller.selectedImage.value!.path,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.file(
+                            File(controller.selectedImage.value!.path),
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
 
               const SizedBox(height: 20),
 
-              // Pilih file button
+              // Pilih file button - Disesuaikan desainnya
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -232,7 +254,7 @@ class PaymentView extends StatelessWidget {
                     controller.fileSelected.value
                         ? "Ganti Bukti Pembayaran"
                         : "Pilih Bukti Pembayaran",
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
@@ -250,25 +272,33 @@ class PaymentView extends StatelessWidget {
 
               const SizedBox(height: 15),
 
-              // Info file terpilih
+              // Info file terpilih - Disesuaikan desainnya
               if (controller.fileSelected.value)
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.green[50],
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.green[200]!),
+                    border: Border.all(color: Colors.green.shade300),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.check_circle, color: Colors.green[700]),
+                      Icon(Icons.check_circle, color: Colors.green.shade700),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           "✔ File berhasil dipilih",
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.green[700],
+                            color: Colors.green.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -280,20 +310,28 @@ class PaymentView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red[50],
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red[200]!),
+                    border: Border.all(color: Colors.red.shade300),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red[700]),
+                      Icon(Icons.error_outline, color: Colors.red.shade700),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           "Belum ada file dipilih",
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.red[700],
+                            color: Colors.red.shade700,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -302,9 +340,9 @@ class PaymentView extends StatelessWidget {
                   ),
                 ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 25),
 
-              // Tombol upload
+              // Tombol upload - Disesuaikan desainnya
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -314,11 +352,10 @@ class PaymentView extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 3,
                   ),
                   child: controller.isLoading.value
                       ? Row(
@@ -333,18 +370,18 @@ class PaymentView extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 15),
-                            Text(
+                            const Text(
                               "Mengupload...",
-                              style: GoogleFonts.poppins(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         )
-                      : Text(
+                      : const Text(
                           "Upload Sekarang",
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -366,19 +403,33 @@ class PaymentView extends StatelessWidget {
           width: 120,
           child: Text(
             label,
-            style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[700]),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ),
         Expanded(
           child: Text(
             value ?? "-",
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
+              color: Colors.black87,
             ),
           ),
         ),
       ],
     );
+  }
+
+  String _formatCurrency(dynamic price) {
+    if (price == null) return "-";
+    try {
+      int value = int.parse(price.toString());
+      return value.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (Match m) => "${m[1]}.",
+      );
+    } catch (e) {
+      return price.toString();
+    }
   }
 }
