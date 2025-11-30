@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterController extends GetxController {
   var nameController = ''.obs;
@@ -79,8 +80,19 @@ class RegisterController extends GetxController {
       final userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      await userCredential.user?.updateDisplayName(name);
-      await userCredential.user?.reload();
+      final user = userCredential.user;
+
+      // Simpan user ke Firestore + role default = user
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        "uid": user.uid,
+        "name": name,
+        "email": email,
+        "role": "user",
+        "createdAt": DateTime.now().toIso8601String(),
+      });
+
+      await user.updateDisplayName(name);
+      await user.reload();
 
       Get.snackbar(
         'Sukses',

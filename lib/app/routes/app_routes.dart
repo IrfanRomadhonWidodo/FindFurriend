@@ -9,9 +9,11 @@ import '../views/grooming/payment_view.dart';
 import '../views/training/training_view.dart';
 import '../views/training/training_payment_view.dart';
 import '../views/boarding/boarding_view.dart';
-import '../views/boarding/boarding_payment_view.dart'; // Tambahkan import ini
+import '../views/boarding/boarding_payment_view.dart';
 import '../views/daycare/daycare_view.dart';
 import '../views/daycare/daycare_payment_view.dart';
+import '../views/admin/admin_home_view.dart';
+import '../views/admin/payment/admin_payment_approval_view.dart';
 
 class AppRoutes {
   static final pages = [
@@ -27,5 +29,10 @@ class AppRoutes {
     GetPage(name: '/boarding-payment', page: () => BoardingPaymentView()),
     GetPage(name: '/daycare', page: () => DaycareView()),
     GetPage(name: '/daycare-payment', page: () => DaycarePaymentView()),
+    GetPage(name: '/admin-home', page: () => const AdminHomeView()),
+    GetPage(
+      name: '/admin-payment-approval',
+      page: () => AdminPaymentApprovalView(orderId: Get.arguments.toString()),
+    ),
   ];
 }

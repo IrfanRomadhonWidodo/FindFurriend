@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginController extends GetxController {
   var emailController = ''.obs;
@@ -40,12 +41,28 @@ class LoginController extends GetxController {
 
     try {
       // 🔥 Login ke Firebase
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      final user = userCredential.user;
+      if (user == null) return;
+
+      // 🔍 Cek role user di Firestore
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      final role = doc.data()?['role'] ?? 'user';
 
       isLoading(false);
+
+      // 🔀 Arahkan sesuai role
+      if (role == 'admin') {
+        Get.offAllNamed('/admin-home');
+      } else {
+        Get.offAllNamed('/home');
+      }
 
       Get.snackbar(
         'Sukses',
@@ -54,9 +71,6 @@ class LoginController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-
-      // 🔀 Gas ke halaman Home setelah login berhasil
-      Get.offAllNamed('/home');
     } on FirebaseAuthException catch (e) {
       isLoading(false);
       Get.snackbar(
