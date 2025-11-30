@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
 
 class PaymentController extends GetxController {
   var selectedImage = Rx<XFile?>(null);
@@ -112,38 +113,22 @@ class PaymentController extends GetxController {
     }
 
     isLoading.value = true;
+    // 🔥 Simpan gambar sebagai Base64 ke Firestore
+final bytes = await selectedImage.value!.readAsBytes();
+String base64Image = base64Encode(bytes);
 
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw "User not login";
 
-      final storageRef = FirebaseStorage.instance.ref().child(
-        "payment_proof/$orderId.jpg",
-      );
-
-      //  🔥 FIX UNTUK WEB vs MOBILE
-      if (kIsWeb) {
-        final bytes = await selectedImage.value!.readAsBytes();
-        await storageRef.putData(
-          bytes,
-          SettableMetadata(contentType: 'image/jpeg'),
-        );
-      } else {
-        await storageRef.putFile(
-          File(selectedImage.value!.path),
-          SettableMetadata(contentType: 'image/jpeg'),
-        );
-      }
-
-      String downloadUrl = await storageRef.getDownloadURL();
-
       await FirebaseFirestore.instance.collection("payments").doc(orderId).set({
-        "orderId": orderId,
-        "userId": user.uid,
-        "paymentProof": downloadUrl,
-        "paymentDate": DateTime.now().toIso8601String(),
-        "status": "pending-verification",
-      });
+  "orderId": orderId,
+  "userId": user.uid,
+  "paymentProof": base64Image,
+  "paymentDate": DateTime.now().toIso8601String(),
+  "status": "pending-verification",
+});
+
 
       await FirebaseFirestore.instance.collection("orders").doc(orderId).update(
         {"status": "payment-uploaded"},
