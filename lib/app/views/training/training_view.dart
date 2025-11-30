@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 // Sesuaikan path import controller jika diperlukan
-import '../../controllers/training/training_controller.dart'; 
+import '../../controllers/training/training_controller.dart';
 
 class TrainingView extends StatelessWidget {
   TrainingView({Key? key}) : super(key: key);
@@ -57,7 +57,7 @@ class TrainingView extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // --- 1. Jenis Peliharaan (Sama dengan Grooming) ---
+            // --- 1. Jenis Peliharaan ---
             const Text(
               "Jenis Peliharaan",
               style: TextStyle(
@@ -139,7 +139,7 @@ class TrainingView extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // --- 2. Tanggal Training (Sama dengan Grooming) ---
+            // --- 2. Tanggal Training ---
             const Text(
               "Tanggal Training",
               style: TextStyle(
@@ -171,7 +171,6 @@ class TrainingView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        // Menggunakan format tanggal yang sama dengan Grooming
                         DateFormat(
                           'dd MMMM yyyy',
                         ).format(controller.selectedDate.value),
@@ -199,8 +198,14 @@ class TrainingView extends StatelessWidget {
             Obx(
               () => Column(
                 children: controller.packageNames.map((pkg) {
-                  final price = controller.priceTable[controller.selectedPet.value]?[pkg] ?? 0;
-                  final shortDetail = controller.shortPackageDetails[pkg] ?? 'Detail tidak tersedia';
+                  final price =
+                      controller.priceTable[controller
+                          .selectedPet
+                          .value]?[pkg] ??
+                      0;
+                  final shortDetail =
+                      controller.shortPackageDetails[pkg] ??
+                      'Detail tidak tersedia';
                   final fullDetails = controller.fullPackageDetails[pkg] ?? [];
 
                   return _buildPackageCard(
@@ -210,14 +215,14 @@ class TrainingView extends StatelessWidget {
                     fullDetails: fullDetails,
                     isSelected: controller.selectedPackage.value == pkg,
                     onTap: () => controller.selectedPackage.value = pkg,
-                    icon: pkg == "Paket Training 1" ? Icons.school : Icons.auto_stories,
+                    icon: _getPackageIcon(pkg),
                   );
                 }).toList(),
               ),
             ),
 
             const SizedBox(height: 25),
-            
+
             // --- Detail Durasi Meeting ---
             const Text(
               "🕒 Durasi Meeting",
@@ -244,15 +249,26 @@ class TrainingView extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Text(
-                controller.durationDetails,
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+              child: Row(
+                children: [
+                  const Icon(Icons.timer, color: Colors.orange, size: 24),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      controller.durationDetails,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 25),
 
-            // --- Kode Promo & Total (Sama dengan Grooming) ---
+            // --- Kode Promo ---
             const Text(
               "Kode Promo",
               style: TextStyle(
@@ -267,6 +283,7 @@ class TrainingView extends StatelessWidget {
                 hintText: "Masukkan kode promo",
                 filled: true,
                 fillColor: Colors.white,
+                prefixIcon: const Icon(Icons.local_offer, color: Colors.orange),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
@@ -286,9 +303,7 @@ class TrainingView extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Total box
-            Obx(
-              () => _buildTotalBox(controller),
-            ),
+            Obx(() => _buildTotalBox(controller)),
 
             const SizedBox(height: 30),
 
@@ -329,8 +344,8 @@ class TrainingView extends StatelessWidget {
       ),
     );
   }
-  
-  // --- Helper Widgets Baru ---
+
+  // --- Helper Widgets ---
 
   Widget _buildPackageCard({
     required String packageName,
@@ -377,11 +392,7 @@ class TrainingView extends StatelessWidget {
                       color: Colors.orange.shade100,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(
-                      icon,
-                      color: Colors.orange,
-                      size: 35,
-                    ),
+                    child: Icon(icon, color: Colors.orange, size: 35),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
@@ -395,8 +406,12 @@ class TrainingView extends StatelessWidget {
                               packageName,
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected ? Colors.orange : Colors.black87,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected
+                                    ? Colors.orange
+                                    : Colors.black87,
                               ),
                             ),
                             Text(
@@ -404,7 +419,9 @@ class TrainingView extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.orange : Colors.black87,
+                                color: isSelected
+                                    ? Colors.orange
+                                    : Colors.black87,
                               ),
                             ),
                           ],
@@ -422,13 +439,13 @@ class TrainingView extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               // Detail Tambahan yang Meluas (Hanya muncul jika paket ini dipilih)
               if (isSelected) ...[
                 const SizedBox(height: 15),
                 const Divider(height: 1, color: Colors.grey),
                 const SizedBox(height: 15),
-                
+
                 const Text(
                   "Detail Paket:",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
@@ -440,13 +457,20 @@ class TrainingView extends StatelessWidget {
                   bool isSubDetail = detail.trim().startsWith('-');
                   bool isHeader = detail.endsWith(':');
                   return Padding(
-                    padding: EdgeInsets.only(left: isSubDetail ? 16.0 : 0.0, bottom: 4.0),
+                    padding: EdgeInsets.only(
+                      left: isSubDetail ? 16.0 : 0.0,
+                      bottom: 4.0,
+                    ),
                     child: Text(
                       isSubDetail ? detail : (isHeader ? detail : '• $detail'),
                       style: TextStyle(
                         fontSize: isSubDetail ? 13 : 14,
-                        fontStyle: detail.startsWith('Cocok untuk:') ? FontStyle.italic : FontStyle.normal,
-                        fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+                        fontStyle: detail.startsWith('Cocok untuk:')
+                            ? FontStyle.italic
+                            : FontStyle.normal,
+                        fontWeight: isHeader
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         color: Colors.black87,
                         height: 1.3,
                       ),
@@ -492,7 +516,9 @@ class TrainingView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   color: controller.isPromoValid ? Colors.grey : Colors.black87,
-                  decoration: controller.isPromoValid ? TextDecoration.lineThrough : null,
+                  decoration: controller.isPromoValid
+                      ? TextDecoration.lineThrough
+                      : null,
                 ),
               ),
             ],
@@ -514,19 +540,13 @@ class TrainingView extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       "Diskon ${controller.discountPercentage * 100}%",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.green,
-                      ),
+                      style: const TextStyle(fontSize: 14, color: Colors.green),
                     ),
                   ],
                 ),
                 Text(
                   "-${controller.formatPrice(controller.discountAmount)}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.green,
-                  ),
+                  style: const TextStyle(fontSize: 14, color: Colors.green),
                 ),
               ],
             ),
@@ -561,5 +581,13 @@ class TrainingView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // --- Helper Icons ---
+  IconData _getPackageIcon(String pkgName) {
+    if (pkgName.contains("Paket Training 1")) return Icons.school;
+    if (pkgName.contains("Paket Training 2")) return Icons.auto_stories;
+    if (pkgName.contains("Paket Training 3")) return Icons.psychology;
+    return Icons.pets;
   }
 }

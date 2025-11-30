@@ -3,14 +3,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TrainingController extends GetxController {
   // Observables (State Management)
-  final selectedPet = ''.obs;
+  final selectedPet =
+      'Kucing'.obs; // Default value seperti di DaycareController
   final selectedDate = DateTime.now().obs;
-  final selectedPackage = ''.obs;
+  final selectedPackage = 'Paket Training 1'.obs; // Default value
   final promoCode = ''.obs;
-  
+
   // Data Statis untuk View
   final pets = ["Kucing", "Anjing"];
   final packageNames = ["Paket Training 1", "Paket Training 2"];
@@ -18,17 +21,11 @@ class TrainingController extends GetxController {
   // --- HARGA YANG SUDAH DIPEBARUI ---
   final Map<String, Map<String, int>> priceTable = {
     // Menggunakan harga yang sama untuk Kucing dan Anjing
-    'Kucing': {
-      'Paket Training 1': 120000, 
-      'Paket Training 2': 200000, 
-    },
-    'Anjing': {
-      'Paket Training 1': 120000, 
-      'Paket Training 2': 200000, 
-    },
+    'Kucing': {'Paket Training 1': 120000, 'Paket Training 2': 200000},
+    'Anjing': {'Paket Training 1': 120000, 'Paket Training 2': 200000},
   };
   // ------------------------------------
-  
+
   // Detail Konten Paket Training (TETAP SAMA)
   final Map<String, List<String>> fullPackageDetails = {
     'Paket Training 1': [
@@ -62,18 +59,26 @@ class TrainingController extends GetxController {
 
   // Detail Ringkas untuk ditampilkan di card paket (TETAP SAMA)
   final Map<String, String> shortPackageDetails = {
-    'Paket Training 1': '8 pertemuan, 2 jam/sesi. Obedience dasar, kontrol emosi ringan, cocok untuk pondasi dasar.',
-    'Paket Training 2': '16 pertemuan, 2 jam/sesi. Obedience lengkap, latihan distraksi, koreksi perilaku ringan.',
+    'Paket Training 1':
+        '8 pertemuan, 2 jam/sesi. Obedience dasar, kontrol emosi ringan, cocok untuk pondasi dasar.',
+    'Paket Training 2':
+        '16 pertemuan, 2 jam/sesi. Obedience lengkap, latihan distraksi, koreksi perilaku ringan.',
   };
-  
-  final String durationDetails = 
+
+  final String durationDetails =
       'Setiap sesi: 2 jam. Kegiatan bisa dibagi misalnya:\n'
       '• 15 menit bonding + fokus\n'
       '• 60–80 menit training inti\n'
       '• 20–25 menit evaluasi & PR untuk owner';
 
+  // Kode promo (mengikuti pola DaycareController)
+  final Map<String, double> promoCodes = {
+    "TRAINING10": 0.10,
+    "PETCARE15": 0.15,
+    "TRAINING20": 0.20,
+  };
 
-  // --- Logic Perhitungan Harga (Mengikuti Pola Grooming Controller) ---
+  // --- Logic Perhitungan Harga (Mengikuti Pola DaycareController) ---
 
   int get originalPrice {
     final pet = selectedPet.value;
@@ -81,25 +86,30 @@ class TrainingController extends GetxController {
     return priceTable[pet]?[pkg] ?? 0;
   }
 
-  final double discountPercentage = 0.20; 
+  int get totalPrice {
+    double price = originalPrice.toDouble();
+    if (promoCodes.containsKey(promoCode.value.toUpperCase())) {
+      price *= (1 - promoCodes[promoCode.value.toUpperCase()]!);
+    }
+    return price.round();
+  }
 
-  bool get isPromoValid {
-    // Asumsi promo "TRAINING20"
-    return promoCode.value.toUpperCase() == 'TRAINING20' && originalPrice > 0;
+  double get discountPercentage {
+    if (promoCodes.containsKey(promoCode.value.toUpperCase())) {
+      return promoCodes[promoCode.value.toUpperCase()]!;
+    }
+    return 0.0;
   }
 
   int get discountAmount {
-    if (isPromoValid) {
-      return (originalPrice * discountPercentage).toInt();
-    }
-    return 0;
+    return (originalPrice * discountPercentage).round();
   }
 
-  int get totalPrice {
-    return originalPrice - discountAmount;
+  bool get isPromoValid {
+    return promoCodes.containsKey(promoCode.value.toUpperCase());
   }
 
-  // --- Logic View/Helper (Mengikuti Pola Grooming Controller) ---
+  // --- Logic View/Helper (Mengikuti Pola DaycareController) ---
 
   Future<void> selectDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
@@ -122,14 +132,48 @@ class TrainingController extends GetxController {
     return formatter.format(price);
   }
 
-  void saveTrainingOrder() {
+  // ================================
+  // 🔥 SAVE ORDER FIREBASE DISINI
+  // ================================
+  Future<void> saveTrainingOrder() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      Get.snackbar(
+        "Gagal",
+        "Login dulu dong 😅",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    final orderRef = FirebaseFirestore.instance.collection("orders").doc();
+
+    await orderRef.set({
+      "orderId": orderRef.id,
+      "userId": user.uid,
+      "serviceType": "training",
+      "pet": selectedPet.value,
+      "package": selectedPackage.value,
+      "originalPrice": originalPrice,
+      "discount": discountAmount,
+      "totalPrice": totalPrice,
+      "promoCode": promoCode.value,
+      "date": selectedDate.value.toIso8601String(),
+      "status": "pending-payment",
+      "createdAt": DateTime.now().toIso8601String(),
+    });
+
     Get.snackbar(
-      "Berhasil!",
-      "Pesanan Training ${selectedPackage.value} (${selectedPet.value}) berhasil dibuat. Total: ${formatPrice(totalPrice)}",
+      "Sukses 🎉",
+      "Pesanan berhasil dibuat!",
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );
-    // Get.toNamed('/upload-payment');
+
+    Get.toNamed('/training-payment', arguments: orderRef.id);
   }
 }

@@ -7,6 +7,7 @@ import '../views/home_view.dart';
 import '../views/grooming/grooming_view.dart';
 import '../views/grooming/payment_view.dart';
 import '../views/training/training_view.dart';
+import '../views/training/training_payment_view.dart';
 import '../views/boarding/boarding_view.dart';
 import '../views/boarding/boarding_payment_view.dart'; // Tambahkan import ini
 import '../views/daycare/daycare_view.dart';
@@ -21,6 +22,7 @@ class AppRoutes {
     GetPage(name: '/grooming', page: () => GroomingView()),
     GetPage(name: '/upload-payment', page: () => PaymentView()),
     GetPage(name: '/training', page: () => TrainingView()),
+    GetPage(name: '/training-payment', page: () => TrainingPaymentView()),
     GetPage(name: '/boarding', page: () => BoardingView()),
     GetPage(name: '/boarding-payment', page: () => BoardingPaymentView()),
     GetPage(name: '/daycare', page: () => DaycareView()),
