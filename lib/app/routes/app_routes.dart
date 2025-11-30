@@ -10,6 +10,7 @@ import '../views/training/training_view.dart';
 import '../views/boarding/boarding_view.dart';
 import '../views/boarding/boarding_payment_view.dart'; // Tambahkan import ini
 import '../views/daycare/daycare_view.dart';
+import '../views/daycare/daycare_payment_view.dart';
 
 class AppRoutes {
   static final pages = [
@@ -23,5 +24,6 @@ class AppRoutes {
     GetPage(name: '/boarding', page: () => BoardingView()),
     GetPage(name: '/boarding-payment', page: () => BoardingPaymentView()),
     GetPage(name: '/daycare', page: () => DaycareView()),
+    GetPage(name: '/daycare-payment', page: () => DaycarePaymentView()),
   ];
 }
