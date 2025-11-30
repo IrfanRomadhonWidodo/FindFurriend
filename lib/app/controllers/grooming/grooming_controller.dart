@@ -108,6 +108,7 @@ class GroomingController extends GetxController {
     await orderRef.set({
       "orderId": orderRef.id,
       "userId": user.uid,
+      "serviceType": "grooming",
       "pet": selectedPet.value,
       "package": selectedPackage.value,
       "originalPrice": originalPrice,
